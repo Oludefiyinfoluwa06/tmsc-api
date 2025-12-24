@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  GALLERY_ADMIN
+  CONTACTS_ADMIN
+}
+
+enum ProductType {
+  MODOOLA
+  MACHINE_EXCHANGE
+  TITANIUM_LASER
+  PROJECTS
+}
+
+enum Status {
+  NEW
+  REVIEWING
+  CONTACTED
+  RESPONDED
+  SENT
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  CLOSED
+}
+
+enum RequestType {
+  CONCEPT_PACK
+  TITANIUM_PACK
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(GALLERY_ADMIN)
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryGroup {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  productType ProductType
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
+  images      Gallery[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Gallery {
+  id          String       @id @default(cuid())
+  productType ProductType
+  imageUrl    String
+  caption     String?
+  description String?
+  order       Int          @default(0)
+  isActive    Boolean      @default(true)
+  groupId     String?
+  group       GalleryGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Mandate {
+  id           String   @id @default(cuid())
+  audienceType String
+  name         String
+  email        String
+  phone        String
+  organization String
+  message      String
+  briefFileUrl String?
+  status       Status   @default(NEW)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Request {
+  id        String      @id @default(cuid())
+  type      RequestType
+  name      String
+  email     String
+  phone     String
+  company   String
+  message   String?
+  status    Status      @default(NEW)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  organization  String
+  audienceType  String
+  preferredDate DateTime
+  preferredTime String
+  message       String?
+  status        Status   @default(NEW)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  audienceType String
+  name         String
+  email        String
+  phone        String
+  organization String?
+  message      String
+  briefFileUrl String?
+  status       Status   @default(NEW)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

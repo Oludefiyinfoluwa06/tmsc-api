@@ -1,0 +1,11 @@
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, Contact, Status } from '@prisma/client';
+export declare class ContactService {
+    private prisma;
+    constructor(prisma: PrismaService);
+    create(data: Prisma.ContactCreateInput): Promise<Contact>;
+    findAll(): Promise<Contact[]>;
+    findOne(id: string): Promise<Contact | null>;
+    updateStatus(id: string, status: Status): Promise<Contact>;
+    remove(id: string): Promise<Contact>;
+}
