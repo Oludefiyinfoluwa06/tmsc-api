@@ -1,18 +1,27 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { ConfigService } from '@nestjs/config';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor(configService: ConfigService) {
-    super();
-    const url = configService.get<string>('DATABASE_URL');
-
-    if (!url) {
-      this.logger.error('DATABASE_URL is not defined in environment variables');
+  constructor() {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL environment variable is not defined');
     }
+
+    const adapter = new PrismaPg({ connectionString });
+    super({ adapter });
   }
 
   async onModuleInit() {
@@ -26,5 +35,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       }
       throw error;
     }
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
   }
 }
