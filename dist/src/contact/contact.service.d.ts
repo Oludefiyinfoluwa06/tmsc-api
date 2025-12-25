@@ -1,8 +1,10 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Contact, Status } from '@prisma/client';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class ContactService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private eventEmitter;
+    constructor(prisma: PrismaService, eventEmitter: EventEmitter2);
     create(data: Prisma.ContactCreateInput): Promise<Contact>;
     findAll(): Promise<Contact[]>;
     findOne(id: string): Promise<Contact | null>;

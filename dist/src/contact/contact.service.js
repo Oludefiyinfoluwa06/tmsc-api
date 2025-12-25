@@ -12,13 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let ContactService = class ContactService {
     prisma;
-    constructor(prisma) {
+    eventEmitter;
+    constructor(prisma, eventEmitter) {
         this.prisma = prisma;
+        this.eventEmitter = eventEmitter;
     }
     async create(data) {
-        return this.prisma.contact.create({ data });
+        const contact = await this.prisma.contact.create({ data });
+        this.eventEmitter.emit('contact.created', contact);
+        return contact;
     }
     async findAll() {
         return this.prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
@@ -39,6 +44,7 @@ let ContactService = class ContactService {
 exports.ContactService = ContactService;
 exports.ContactService = ContactService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        event_emitter_1.EventEmitter2])
 ], ContactService);
 //# sourceMappingURL=contact.service.js.map

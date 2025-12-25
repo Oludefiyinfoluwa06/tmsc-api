@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Booking, Status } from '@prisma/client';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   async create(data: Prisma.BookingCreateInput): Promise<Booking> {
-    return this.prisma.booking.create({ data });
+    const booking = await this.prisma.booking.create({ data });
+    this.eventEmitter.emit('booking.created', booking);
+    return booking;
   }
 
   async findAll(): Promise<Booking[]> {

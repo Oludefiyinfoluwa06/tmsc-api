@@ -13,10 +13,13 @@ import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { GalleryGroupsModule } from './gallery-groups/gallery-groups.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    EventEmitterModule.forRoot(),
     UsersModule,
     PrismaModule,
     AuthModule,
@@ -28,6 +31,7 @@ import { GalleryGroupsModule } from './gallery-groups/gallery-groups.module';
     UploadModule,
     AnalyticsModule,
     GalleryGroupsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

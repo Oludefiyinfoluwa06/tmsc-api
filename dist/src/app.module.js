@@ -22,6 +22,8 @@ const contact_module_1 = require("./contact/contact.module");
 const upload_module_1 = require("./upload/upload.module");
 const analytics_module_1 = require("./analytics/analytics.module");
 const gallery_groups_module_1 = require("./gallery-groups/gallery-groups.module");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const notifications_module_1 = require("./notifications/notifications.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,6 +31,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
+            event_emitter_1.EventEmitterModule.forRoot(),
             users_module_1.UsersModule,
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
@@ -40,6 +43,7 @@ exports.AppModule = AppModule = __decorate([
             upload_module_1.UploadModule,
             analytics_module_1.AnalyticsModule,
             gallery_groups_module_1.GalleryGroupsModule,
+            notifications_module_1.NotificationsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
