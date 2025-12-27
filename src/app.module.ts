@@ -15,11 +15,13 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { GalleryGroupsModule } from './gallery-groups/gallery-groups.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsModule } from './notifications/notifications.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     EventEmitterModule.forRoot(),
+    DatabaseModule,
     UsersModule,
     PrismaModule,
     AuthModule,

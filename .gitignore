@@ -61,7 +61,3 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
-
-SYSTEM_DOCUMENTATION*
-tmsc_api_collection.json
-
