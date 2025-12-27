@@ -4,6 +4,6 @@ import { MandatesController } from './mandates.controller';
 
 @Module({
   providers: [MandatesService],
-  controllers: [MandatesController]
+  controllers: [MandatesController],
 })
 export class MandatesModule {}

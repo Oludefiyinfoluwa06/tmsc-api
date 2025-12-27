@@ -8,7 +8,7 @@ export class GalleryService {
 
   async findAllPublic(
     productType: ProductType,
-    groupId?: string,
+    groupId?: string | null,
   ): Promise<Gallery[]> {
     const where: Prisma.GalleryWhereInput = {
       productType,
@@ -29,7 +29,7 @@ export class GalleryService {
 
   async findAllAdmin(
     productType: ProductType,
-    groupId?: string,
+    groupId?: string | null,
   ): Promise<Gallery[]> {
     const where: Prisma.GalleryWhereInput = {
       productType,

@@ -32,7 +32,6 @@ export class AuthController {
     return this.authService.login(user as AuthUser);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@Request() req: RequestWithUser) {
