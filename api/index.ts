@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
-import { bootstrap } from '../src/main';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { bootstrap } from '../src/app-setup';
+
+let cachedApp: NestExpressApplication;
 
 export default async (req: Request, res: Response) => {
-  const app = await bootstrap();
-  const instance = app.getHttpAdapter().getInstance();
+  if (!cachedApp) {
+    cachedApp = await bootstrap();
+  }
+  const instance = cachedApp.getHttpAdapter().getInstance();
   instance(req, res);
 };

@@ -22,7 +22,9 @@ export class UploadController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/briefs',
+        destination: process.env.VERCEL
+          ? '/tmp/uploads/briefs'
+          : './uploads/briefs',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
@@ -63,7 +65,9 @@ export class UploadController {
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: diskStorage({
-        destination: './uploads/gallery',
+        destination: process.env.VERCEL
+          ? '/tmp/uploads/gallery'
+          : './uploads/gallery',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)

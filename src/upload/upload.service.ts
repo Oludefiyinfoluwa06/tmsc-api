@@ -4,7 +4,9 @@ import { join } from 'path';
 
 @Injectable()
 export class UploadService {
-  private readonly uploadPath = join(process.cwd(), 'uploads');
+  private readonly uploadPath = process.env.VERCEL
+    ? join('/tmp', 'uploads')
+    : join(process.cwd(), 'uploads');
 
   constructor() {
     this.ensureUploadDir();
