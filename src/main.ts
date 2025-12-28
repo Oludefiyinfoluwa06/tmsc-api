@@ -5,11 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-async function bootstrap() {
-  console.log(
-    'DATABASE_URL:',
-    process.env.DATABASE_URL ? 'Defined' : 'UNDEFINED',
-  );
+export async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(
@@ -26,8 +22,15 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    await app.listen(process.env.PORT ?? 3000);
+  }
+
+  return app;
 }
-bootstrap().catch((error) => {
-  console.error('Failed to start the application:', error);
-});
+
+if (!process.env.VERCEL) {
+  bootstrap().catch((error) => {
+    console.error('Failed to start the application:', error);
+  });
+}
