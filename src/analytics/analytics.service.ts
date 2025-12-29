@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductType, Status } from '@prisma/client';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class AnalyticsService {
@@ -79,19 +79,15 @@ export class AnalyticsService {
   }
 
   private async getGalleryStats() {
-    const modoola = await this.prisma.gallery.count({
-      where: { productType: ProductType.MODOOLA },
-    });
-    const machineExchange = await this.prisma.gallery.count({
-      where: { productType: ProductType.MACHINE_EXCHANGE },
-    });
-    const titaniumLaser = await this.prisma.gallery.count({
-      where: { productType: ProductType.TITANIUM_LASER },
-    });
-    const projects = await this.prisma.gallery.count({
-      where: { productType: ProductType.PROJECTS },
-    });
+    const products = await this.prisma.product.findMany();
+    const stats: Record<string, number> = {};
 
-    return { modoola, machineExchange, titaniumLaser, projects };
+    for (const product of products) {
+      stats[product.slug] = await this.prisma.gallery.count({
+        where: { productId: product.id },
+      });
+    }
+
+    return stats;
   }
 }

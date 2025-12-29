@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { GalleryService } from './gallery.service';
-import { ProductType, Role, Prisma } from '@prisma/client';
+import { Role, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -21,43 +21,40 @@ export class GalleryController {
   constructor(private readonly galleryService: GalleryService) {}
 
   // Public Endpoints
-  @Get('gallery/:productType')
+  @Get('gallery/:productSlug')
   getPublicGallery(
-    @Param('productType') productType: string,
+    @Param('productSlug') productSlug: string,
     @Query('groupId') groupId?: string,
   ) {
-    const type = productType.toUpperCase().replace('-', '_') as ProductType;
-    return this.galleryService.findAllPublic(type, groupId);
+    return this.galleryService.findAllPublic(productSlug, groupId);
   }
 
   // Admin Endpoints
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
-  @Get('admin/gallery/:productType')
+  @Get('admin/gallery/:productId')
   getAdminGallery(
-    @Param('productType') productType: string,
+    @Param('productId') productId: string,
     @Query('groupId') groupId?: string,
   ) {
-    const type = productType.toUpperCase().replace('-', '_') as ProductType;
-    return this.galleryService.findAllAdmin(type, groupId);
+    return this.galleryService.findAllAdmin(productId, groupId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
-  @Post('admin/gallery/:productType')
+  @Post('admin/gallery/:productId')
   create(
-    @Param('productType') productType: string,
+    @Param('productId') productId: string,
     @Body()
-    data: Omit<Prisma.GalleryCreateInput, 'productType' | 'group'> & {
+    data: Omit<Prisma.GalleryCreateInput, 'product' | 'group'> & {
       groupId?: string;
     },
   ) {
-    const type = productType.toUpperCase().replace('-', '_') as ProductType;
     const { groupId, ...rest } = data;
 
     const createData: Prisma.GalleryCreateInput = {
       ...rest,
-      productType: type,
+      product: { connect: { id: productId } },
     };
 
     if (groupId) {

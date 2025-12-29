@@ -14,25 +14,24 @@ import { GalleryGroupsService } from './gallery-groups.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { Role, ProductType, Prisma } from '@prisma/client';
+import { Role, Prisma } from '@prisma/client';
 
 @Controller()
 export class GalleryGroupsController {
   constructor(private readonly galleryGroupsService: GalleryGroupsService) {}
 
   // Public Endpoint
-  @Get('gallery-groups/:productType')
-  getPublicGroups(@Param('productType') productType: string) {
-    const type = productType.toUpperCase().replace('-', '_') as ProductType;
-    return this.galleryGroupsService.findAll(type);
+  @Get('gallery-groups/:productSlug')
+  async getPublicGroups(@Param('productSlug') productSlug: string) {
+    return this.galleryGroupsService.findAllBySlug(productSlug);
   }
 
   // Admin Endpoints
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
   @Get('admin/gallery-groups')
-  findAll(@Query('productType') productType?: ProductType) {
-    return this.galleryGroupsService.findAll(productType);
+  findAll(@Query('productId') productId?: string) {
+    return this.galleryGroupsService.findAll(productId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

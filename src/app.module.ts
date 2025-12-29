@@ -16,6 +16,7 @@ import { GalleryGroupsModule } from './gallery-groups/gallery-groups.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DatabaseModule } from './database/database.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DatabaseModule } from './database/database.module';
     AnalyticsModule,
     GalleryGroupsModule,
     NotificationsModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

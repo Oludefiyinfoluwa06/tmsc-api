@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, ProductType, GalleryGroup } from '@prisma/client';
+import { Prisma, GalleryGroup } from '@prisma/client';
 
 @Injectable()
 export class GalleryGroupsService {
@@ -12,9 +12,29 @@ export class GalleryGroupsService {
     });
   }
 
-  async findAll(productType?: ProductType): Promise<GalleryGroup[]> {
+  async findAll(productId?: string): Promise<GalleryGroup[]> {
     return await this.prisma.galleryGroup.findMany({
-      where: productType ? { productType, isActive: true } : { isActive: true },
+      where: productId ? { productId, isActive: true } : { isActive: true },
+      orderBy: { order: 'asc' },
+      include: {
+        images: {
+          where: { isActive: true },
+          orderBy: { order: 'asc' },
+        },
+      },
+    });
+  }
+
+  async findAllBySlug(productSlug: string): Promise<GalleryGroup[]> {
+    const product = await this.prisma.product.findUnique({
+      where: { slug: productSlug },
+    });
+
+    if (!product)
+      throw new NotFoundException(`Product with slug ${productSlug} not found`);
+
+    return await this.prisma.galleryGroup.findMany({
+      where: { productId: product.id, isActive: true },
       orderBy: { order: 'asc' },
       include: {
         images: {

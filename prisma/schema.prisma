@@ -13,11 +13,18 @@ enum Role {
   CONTACTS_ADMIN
 }
 
-enum ProductType {
-  MODOOLA
-  MACHINE_EXCHANGE
-  TITANIUM_LASER
-  PROJECTS
+model Product {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  title       String
+  description String?
+  images      String[]       @default([])
+  order       Int            @default(0)
+  isActive    Boolean        @default(true)
+  groups      GalleryGroup[]
+  galleries   Gallery[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 enum Status {
@@ -50,29 +57,31 @@ model User {
 }
 
 model GalleryGroup {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String?
-  productType ProductType
-  order       Int         @default(0)
-  isActive    Boolean     @default(true)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
   images      Gallery[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Gallery {
-  id          String       @id @default(cuid())
-  productType ProductType
+  id          String        @id @default(cuid())
+  productId   String?
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: Cascade)
   imageUrl    String
   caption     String?
   description String?
-  order       Int          @default(0)
-  isActive    Boolean      @default(true)
+  order       Int           @default(0)
+  isActive    Boolean       @default(true)
   groupId     String?
   group       GalleryGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Mandate {

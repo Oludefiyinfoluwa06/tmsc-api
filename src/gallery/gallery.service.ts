@@ -1,17 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductType, Prisma, Gallery } from '@prisma/client';
+import { Prisma, Gallery } from '@prisma/client';
 
 @Injectable()
 export class GalleryService {
   constructor(private prisma: PrismaService) {}
 
   async findAllPublic(
-    productType: ProductType,
+    productSlug: string,
     groupId?: string | null,
   ): Promise<Gallery[]> {
+    const product = await this.prisma.product.findUnique({
+      where: { slug: productSlug },
+    });
+
+    if (!product) return [];
+
     const where: Prisma.GalleryWhereInput = {
-      productType,
+      productId: product.id,
       isActive: true,
     };
 
@@ -28,11 +34,11 @@ export class GalleryService {
   }
 
   async findAllAdmin(
-    productType: ProductType,
+    productId: string,
     groupId?: string | null,
   ): Promise<Gallery[]> {
     const where: Prisma.GalleryWhereInput = {
-      productType,
+      productId,
     };
 
     if (groupId) {
