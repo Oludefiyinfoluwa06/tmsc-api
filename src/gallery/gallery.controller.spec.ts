@@ -1,14 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GalleryController } from './gallery.controller';
 import { GalleryService } from './gallery.service';
-import { ProductType } from '@prisma/client';
 
 describe('GalleryController', () => {
   let controller: GalleryController;
 
   const mockGallery = {
     id: '1',
-    productType: ProductType.MODOOLA,
+    productId: 'product-1',
     imageUrl: 'https://example.com/image.jpg',
     caption: 'Test Image',
     description: null,
@@ -49,40 +48,34 @@ describe('GalleryController', () => {
   });
 
   describe('getPublicGallery', () => {
-    it('should return public gallery for a product type', async () => {
+    it('should return all active galleries', async () => {
       const galleries = [mockGallery];
       mockGalleryService.findAllPublic.mockResolvedValue(galleries);
 
-      const result = await controller.getPublicGallery('modoola');
+      const result = await controller.getPublicGallery();
 
-      expect(mockGalleryService.findAllPublic).toHaveBeenCalledWith(
-        ProductType.MODOOLA,
-        undefined,
-      );
+      expect(mockGalleryService.findAllPublic).toHaveBeenCalledWith(undefined);
       expect(result).toEqual(galleries);
     });
 
-    it('should handle product type with dashes', async () => {
-      mockGalleryService.findAllPublic.mockResolvedValue([]);
+    it('should filter by groupId when provided', async () => {
+      mockGalleryService.findAllPublic.mockResolvedValue([mockGallery]);
 
-      await controller.getPublicGallery('machine-exchange', 'group1');
+      await controller.getPublicGallery('group1');
 
-      expect(mockGalleryService.findAllPublic).toHaveBeenCalledWith(
-        ProductType.MACHINE_EXCHANGE,
-        'group1',
-      );
+      expect(mockGalleryService.findAllPublic).toHaveBeenCalledWith('group1');
     });
   });
 
   describe('getAdminGallery', () => {
-    it('should return admin gallery for a product type', async () => {
+    it('should return admin gallery for a productId', async () => {
       const galleries = [mockGallery];
       mockGalleryService.findAllAdmin.mockResolvedValue(galleries);
 
-      const result = await controller.getAdminGallery('titanium-laser');
+      const result = await controller.getAdminGallery('product-123');
 
       expect(mockGalleryService.findAllAdmin).toHaveBeenCalledWith(
-        ProductType.TITANIUM_LASER,
+        'product-123',
         undefined,
       );
       expect(result).toEqual(galleries);
@@ -100,10 +93,9 @@ describe('GalleryController', () => {
       mockGalleryService.create.mockResolvedValue({
         ...mockGallery,
         ...createData,
-        productType: ProductType.PROJECTS,
       });
 
-      const result = await controller.create('projects', createData);
+      const result = await controller.create('product-456', createData);
 
       expect(mockGalleryService.create).toHaveBeenCalled();
       expect(result.imageUrl).toBe(createData.imageUrl);
@@ -119,11 +111,11 @@ describe('GalleryController', () => {
 
       mockGalleryService.create.mockResolvedValue(mockGallery);
 
-      await controller.create('modoola', createData);
+      await controller.create('product-789', createData);
 
       expect(mockGalleryService.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          productType: ProductType.MODOOLA,
+          product: { connect: { id: 'product-789' } },
           group: { connect: { id: 'group123' } },
         }),
       );

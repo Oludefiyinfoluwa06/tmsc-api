@@ -6,18 +6,8 @@ import { Prisma, Gallery } from '@prisma/client';
 export class GalleryService {
   constructor(private prisma: PrismaService) {}
 
-  async findAllPublic(
-    productSlug: string,
-    groupId?: string | null,
-  ): Promise<Gallery[]> {
-    const product = await this.prisma.product.findUnique({
-      where: { slug: productSlug },
-    });
-
-    if (!product) return [];
-
+  async findAllPublic(groupId?: string | null): Promise<Gallery[]> {
     const where: Prisma.GalleryWhereInput = {
-      productId: product.id,
       isActive: true,
     };
 

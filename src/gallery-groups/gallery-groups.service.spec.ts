@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GalleryGroupsService } from './gallery-groups.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { GalleryGroup, ProductType } from '@prisma/client';
+import { GalleryGroup, Prisma } from '@prisma/client';
 import { NotFoundException } from '@nestjs/common';
 
 describe('GalleryGroupsService', () => {
@@ -9,7 +9,7 @@ describe('GalleryGroupsService', () => {
 
   const mockGalleryGroup: GalleryGroup = {
     id: '1',
-    productType: ProductType.MODOOLA,
+    productId: 'product-1',
     title: 'Test Group',
     description: 'Test Description',
     order: 1,
@@ -25,6 +25,9 @@ describe('GalleryGroupsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+    },
+    product: {
+      findUnique: jest.fn(),
     },
   };
 
@@ -50,8 +53,7 @@ describe('GalleryGroupsService', () => {
 
   describe('create', () => {
     it('should create a new gallery group', async () => {
-      const createData = {
-        productType: ProductType.PROJECTS,
+      const createData: Partial<Prisma.GalleryGroupCreateInput> = {
         title: 'New Group',
         description: 'New Description',
         order: 1,
@@ -62,7 +64,9 @@ describe('GalleryGroupsService', () => {
         ...createData,
       });
 
-      const result = await service.create(createData);
+      const result = await service.create(
+        createData as Prisma.GalleryGroupCreateInput,
+      );
 
       expect(mockPrismaService.galleryGroup.create).toHaveBeenCalledWith({
         data: createData,
@@ -71,8 +75,29 @@ describe('GalleryGroupsService', () => {
     });
   });
 
+  describe('findAllPublic', () => {
+    it('should find all active gallery groups for public endpoint', async () => {
+      const groups = [mockGalleryGroup];
+      mockPrismaService.galleryGroup.findMany.mockResolvedValue(groups);
+
+      const result = await service.findAllPublic();
+
+      expect(mockPrismaService.galleryGroup.findMany).toHaveBeenCalledWith({
+        where: { isActive: true },
+        orderBy: { order: 'asc' },
+        include: {
+          images: {
+            where: { isActive: true },
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
+      expect(result).toEqual(groups);
+    });
+  });
+
   describe('findAll', () => {
-    it('should find all active groups without product type filter', async () => {
+    it('should find all active groups without productId filter', async () => {
       const groups = [mockGalleryGroup];
       mockPrismaService.galleryGroup.findMany.mockResolvedValue(groups);
 
@@ -91,14 +116,14 @@ describe('GalleryGroupsService', () => {
       expect(result).toEqual(groups);
     });
 
-    it('should filter groups by product type when provided', async () => {
+    it('should filter groups by productId when provided', async () => {
       const groups = [mockGalleryGroup];
       mockPrismaService.galleryGroup.findMany.mockResolvedValue(groups);
 
-      await service.findAll(ProductType.MACHINE_EXCHANGE);
+      await service.findAll('product-123');
 
       expect(mockPrismaService.galleryGroup.findMany).toHaveBeenCalledWith({
-        where: { productType: ProductType.MACHINE_EXCHANGE, isActive: true },
+        where: { productId: 'product-123', isActive: true },
         orderBy: { order: 'asc' },
         include: {
           images: {

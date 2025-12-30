@@ -21,9 +21,9 @@ export class GalleryGroupsController {
   constructor(private readonly galleryGroupsService: GalleryGroupsService) {}
 
   // Public Endpoint
-  @Get('gallery-groups/:productSlug')
-  async getPublicGroups(@Param('productSlug') productSlug: string) {
-    return this.galleryGroupsService.findAllBySlug(productSlug);
+  @Get('gallery-groups')
+  async getPublicGroups() {
+    return this.galleryGroupsService.findAllPublic();
   }
 
   // Admin Endpoints

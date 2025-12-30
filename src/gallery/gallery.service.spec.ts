@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GalleryService } from './gallery.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { Gallery, ProductType } from '@prisma/client';
+import { Gallery, Prisma } from '@prisma/client';
 
 describe('GalleryService', () => {
   let service: GalleryService;
 
   const mockGallery: Gallery = {
     id: '1',
-    productType: ProductType.MODOOLA,
+    productId: 'product-1',
     imageUrl: 'https://example.com/image.jpg',
     caption: 'Test Image',
     description: null,
@@ -50,16 +50,15 @@ describe('GalleryService', () => {
   });
 
   describe('findAllPublic', () => {
-    it('should find all active galleries for a product type', async () => {
+    it('should find all active galleries', async () => {
       const galleries = [mockGallery];
       mockPrismaService.gallery.findMany.mockResolvedValue(galleries);
 
-      const result = await service.findAllPublic(ProductType.MODOOLA);
+      const result = await service.findAllPublic();
 
       expect(result).toEqual(galleries);
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productType: ProductType.MODOOLA,
           isActive: true,
         },
         orderBy: { order: 'asc' },
@@ -70,11 +69,10 @@ describe('GalleryService', () => {
       const galleries = [{ ...mockGallery, groupId: 'group1' }];
       mockPrismaService.gallery.findMany.mockResolvedValue(galleries);
 
-      await service.findAllPublic(ProductType.MODOOLA, 'group1');
+      await service.findAllPublic('group1');
 
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productType: ProductType.MODOOLA,
           isActive: true,
           groupId: 'group1',
         },
@@ -86,11 +84,10 @@ describe('GalleryService', () => {
       const galleries = [mockGallery];
       mockPrismaService.gallery.findMany.mockResolvedValue(galleries);
 
-      await service.findAllPublic(ProductType.MODOOLA, null);
+      await service.findAllPublic(null);
 
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productType: ProductType.MODOOLA,
           isActive: true,
           groupId: { equals: null },
         },
@@ -107,12 +104,12 @@ describe('GalleryService', () => {
       ];
       mockPrismaService.gallery.findMany.mockResolvedValue(galleries);
 
-      const result = await service.findAllAdmin(ProductType.MACHINE_EXCHANGE);
+      const result = await service.findAllAdmin('product-123');
 
       expect(result).toEqual(galleries);
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productType: ProductType.MACHINE_EXCHANGE,
+          productId: 'product-123',
         },
         orderBy: { order: 'asc' },
       });
@@ -121,11 +118,11 @@ describe('GalleryService', () => {
     it('should filter by groupId for admin when provided', async () => {
       mockPrismaService.gallery.findMany.mockResolvedValue([mockGallery]);
 
-      await service.findAllAdmin(ProductType.TITANIUM_LASER, 'group2');
+      await service.findAllAdmin('product-456', 'group2');
 
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productType: ProductType.TITANIUM_LASER,
+          productId: 'product-456',
           groupId: 'group2',
         },
         orderBy: { order: 'asc' },
@@ -135,8 +132,7 @@ describe('GalleryService', () => {
 
   describe('create', () => {
     it('should create a new gallery item', async () => {
-      const createData = {
-        productType: ProductType.PROJECTS,
+      const createData: Partial<Prisma.GalleryCreateInput> = {
         imageUrl: 'https://example.com/new.jpg',
         caption: 'New Image',
         order: 5,
@@ -147,7 +143,9 @@ describe('GalleryService', () => {
         ...createData,
       });
 
-      const result = await service.create(createData);
+      const result = await service.create(
+        createData as Prisma.GalleryCreateInput,
+      );
 
       expect(mockPrismaService.gallery.create).toHaveBeenCalledWith({
         data: createData,

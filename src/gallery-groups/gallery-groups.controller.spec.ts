@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GalleryGroupsController } from './gallery-groups.controller';
 import { GalleryGroupsService } from './gallery-groups.service';
-import { ProductType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 describe('GalleryGroupsController', () => {
   let controller: GalleryGroupsController;
 
   const mockGalleryGroup = {
     id: '1',
-    productType: ProductType.MODOOLA,
+    productId: 'product-1',
     title: 'Test Group',
     description: 'Test Description',
     order: 1,
@@ -20,6 +20,7 @@ describe('GalleryGroupsController', () => {
   const mockGalleryGroupsService = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllPublic: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
@@ -46,6 +47,18 @@ describe('GalleryGroupsController', () => {
     expect(controller).toBeDefined();
   });
 
+  describe('getPublicGroups', () => {
+    it('should return all active gallery groups', async () => {
+      const groups = [mockGalleryGroup, { ...mockGalleryGroup, id: '2' }];
+      mockGalleryGroupsService.findAllPublic.mockResolvedValue(groups);
+
+      const result = await controller.getPublicGroups();
+
+      expect(mockGalleryGroupsService.findAllPublic).toHaveBeenCalled();
+      expect(result).toEqual(groups);
+    });
+  });
+
   describe('findAll', () => {
     it('should return all gallery groups', async () => {
       const groups = [mockGalleryGroup, { ...mockGalleryGroup, id: '2' }];
@@ -57,13 +70,13 @@ describe('GalleryGroupsController', () => {
       expect(result).toEqual(groups);
     });
 
-    it('should filter by product type when provided', async () => {
+    it('should filter by productId when provided', async () => {
       mockGalleryGroupsService.findAll.mockResolvedValue([mockGalleryGroup]);
 
-      await controller.findAll(ProductType.MACHINE_EXCHANGE);
+      await controller.findAll('product-123');
 
       expect(mockGalleryGroupsService.findAll).toHaveBeenCalledWith(
-        ProductType.MACHINE_EXCHANGE,
+        'product-123',
       );
     });
   });
@@ -81,8 +94,7 @@ describe('GalleryGroupsController', () => {
 
   describe('create', () => {
     it('should create a new gallery group', async () => {
-      const createData = {
-        productType: ProductType.PROJECTS,
+      const createData: Partial<Prisma.GalleryGroupCreateInput> = {
         title: 'New Group',
         description: 'New Description',
         order: 2,
@@ -93,7 +105,9 @@ describe('GalleryGroupsController', () => {
         ...createData,
       });
 
-      const result = await controller.create(createData);
+      const result = await controller.create(
+        createData as Prisma.GalleryGroupCreateInput,
+      );
 
       expect(mockGalleryGroupsService.create).toHaveBeenCalledWith(createData);
       expect(result.title).toBe('New Group');

@@ -21,12 +21,9 @@ export class GalleryController {
   constructor(private readonly galleryService: GalleryService) {}
 
   // Public Endpoints
-  @Get('gallery/:productSlug')
-  getPublicGallery(
-    @Param('productSlug') productSlug: string,
-    @Query('groupId') groupId?: string,
-  ) {
-    return this.galleryService.findAllPublic(productSlug, groupId);
+  @Get('gallery')
+  getPublicGallery(@Query('groupId') groupId?: string) {
+    return this.galleryService.findAllPublic(groupId);
   }
 
   // Admin Endpoints

@@ -25,16 +25,9 @@ export class GalleryGroupsService {
     });
   }
 
-  async findAllBySlug(productSlug: string): Promise<GalleryGroup[]> {
-    const product = await this.prisma.product.findUnique({
-      where: { slug: productSlug },
-    });
-
-    if (!product)
-      throw new NotFoundException(`Product with slug ${productSlug} not found`);
-
+  async findAllPublic(): Promise<GalleryGroup[]> {
     return await this.prisma.galleryGroup.findMany({
-      where: { productId: product.id, isActive: true },
+      where: { isActive: true },
       orderBy: { order: 'asc' },
       include: {
         images: {
