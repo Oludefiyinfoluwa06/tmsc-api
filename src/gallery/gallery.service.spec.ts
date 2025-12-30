@@ -8,7 +8,6 @@ describe('GalleryService', () => {
 
   const mockGallery: Gallery = {
     id: '1',
-    productId: 'product-1',
     imageUrl: 'https://example.com/image.jpg',
     caption: 'Test Image',
     description: null,
@@ -104,13 +103,11 @@ describe('GalleryService', () => {
       ];
       mockPrismaService.gallery.findMany.mockResolvedValue(galleries);
 
-      const result = await service.findAllAdmin('product-123');
+      const result = await service.findAllAdmin();
 
       expect(result).toEqual(galleries);
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
-        where: {
-          productId: 'product-123',
-        },
+        where: {},
         orderBy: { order: 'asc' },
       });
     });
@@ -118,11 +115,10 @@ describe('GalleryService', () => {
     it('should filter by groupId for admin when provided', async () => {
       mockPrismaService.gallery.findMany.mockResolvedValue([mockGallery]);
 
-      await service.findAllAdmin('product-456', 'group2');
+      await service.findAllAdmin('group2');
 
       expect(mockPrismaService.gallery.findMany).toHaveBeenCalledWith({
         where: {
-          productId: 'product-456',
           groupId: 'group2',
         },
         orderBy: { order: 'asc' },

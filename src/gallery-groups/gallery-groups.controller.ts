@@ -8,7 +8,6 @@ import {
   Delete,
   Patch,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { GalleryGroupsService } from './gallery-groups.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -30,8 +29,8 @@ export class GalleryGroupsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
   @Get('admin/gallery-groups')
-  findAll(@Query('productId') productId?: string) {
-    return this.galleryGroupsService.findAll(productId);
+  findAll() {
+    return this.galleryGroupsService.findAll();
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

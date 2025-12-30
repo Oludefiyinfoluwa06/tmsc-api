@@ -21,8 +21,6 @@ model Product {
   images      String[]       @default([])
   order       Int            @default(0)
   isActive    Boolean        @default(true)
-  groups      GalleryGroup[]
-  galleries   Gallery[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 }
@@ -60,8 +58,6 @@ model GalleryGroup {
   id          String   @id @default(cuid())
   title       String
   description String?
-  productId   String?
-  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   order       Int      @default(0)
   isActive    Boolean  @default(true)
   images      Gallery[]
@@ -71,8 +67,6 @@ model GalleryGroup {
 
 model Gallery {
   id          String        @id @default(cuid())
-  productId   String?
-  product     Product?      @relation(fields: [productId], references: [id], onDelete: Cascade)
   imageUrl    String
   caption     String?
   description String?

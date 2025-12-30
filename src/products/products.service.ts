@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 import { CreateProductDto, UpdateProductDto } from './products.dto';
 
 @Injectable()
@@ -8,11 +12,21 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateProductDto): Promise<Product> {
-    return await this.prisma.product.create({
-      data: {
-        ...data,
-      },
-    });
+    try {
+      return await this.prisma.product.create({
+        data: {
+          ...data,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Product with this slug already exists');
+      }
+      throw error;
+    }
   }
 
   async findAllAdmin(): Promise<Product[]> {
@@ -31,18 +45,6 @@ export class ProductsService {
   async findOne(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: {
-        groups: {
-          where: { isActive: true },
-          orderBy: { order: 'asc' },
-          include: {
-            images: {
-              where: { isActive: true },
-              orderBy: { order: 'asc' },
-            },
-          },
-        },
-      },
     });
     if (!product)
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -52,18 +54,6 @@ export class ProductsService {
   async findBySlug(slug: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({
       where: { slug },
-      include: {
-        groups: {
-          where: { isActive: true },
-          orderBy: { order: 'asc' },
-          include: {
-            images: {
-              where: { isActive: true },
-              orderBy: { order: 'asc' },
-            },
-          },
-        },
-      },
     });
     if (!product)
       throw new NotFoundException(`Product with slug ${slug} not found`);

@@ -29,19 +29,15 @@ export class GalleryController {
   // Admin Endpoints
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
-  @Get('admin/gallery/:productId')
-  getAdminGallery(
-    @Param('productId') productId: string,
-    @Query('groupId') groupId?: string,
-  ) {
-    return this.galleryService.findAllAdmin(productId, groupId);
+  @Get('admin/gallery')
+  getAdminGallery(@Query('groupId') groupId?: string) {
+    return this.galleryService.findAllAdmin(groupId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.GALLERY_ADMIN)
-  @Post('admin/gallery/:productId')
+  @Post('admin/gallery')
   create(
-    @Param('productId') productId: string,
     @Body()
     data: Omit<Prisma.GalleryCreateInput, 'product' | 'group'> & {
       groupId?: string;
@@ -51,7 +47,6 @@ export class GalleryController {
 
     const createData: Prisma.GalleryCreateInput = {
       ...rest,
-      product: { connect: { id: productId } },
     };
 
     if (groupId) {

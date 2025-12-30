@@ -79,15 +79,7 @@ export class AnalyticsService {
   }
 
   private async getGalleryStats() {
-    const products = await this.prisma.product.findMany();
-    const stats: Record<string, number> = {};
-
-    for (const product of products) {
-      stats[product.slug] = await this.prisma.gallery.count({
-        where: { productId: product.id },
-      });
-    }
-
-    return stats;
+    const total = await this.prisma.gallery.count();
+    return { total };
   }
 }

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyticsService } from './analytics.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductType, Status } from '@prisma/client';
+import { Status } from '@prisma/client';
 
 describe('AnalyticsService', () => {
   let service: AnalyticsService;
@@ -72,11 +72,7 @@ describe('AnalyticsService', () => {
         .mockResolvedValueOnce(12); // new
 
       // Mock gallery stats
-      mockPrismaService.gallery.count
-        .mockResolvedValueOnce(25) // modoola
-        .mockResolvedValueOnce(18) // machine exchange
-        .mockResolvedValueOnce(22) // titanium laser
-        .mockResolvedValueOnce(30); // projects
+      mockPrismaService.gallery.count.mockResolvedValueOnce(95); // total
 
       const result = await service.getDashboardStats();
 
@@ -92,10 +88,7 @@ describe('AnalyticsService', () => {
         requests: { conceptPack: 20, titaniumPack: 15 },
         contacts: { total: 40, new: 12 },
         galleryImages: {
-          modoola: 25,
-          machineExchange: 18,
-          titaniumLaser: 22,
-          projects: 30,
+          total: 95,
         },
       });
 
@@ -104,7 +97,7 @@ describe('AnalyticsService', () => {
       expect(mockPrismaService.booking.count).toHaveBeenCalledTimes(4);
       expect(mockPrismaService.request.count).toHaveBeenCalledTimes(2);
       expect(mockPrismaService.contact.count).toHaveBeenCalledTimes(2);
-      expect(mockPrismaService.gallery.count).toHaveBeenCalledTimes(4);
+      expect(mockPrismaService.gallery.count).toHaveBeenCalledTimes(1);
     });
 
     it('should call count with correct filters for mandate stats', async () => {
@@ -131,7 +124,7 @@ describe('AnalyticsService', () => {
       });
     });
 
-    it('should call count with correct filters for gallery stats', async () => {
+    it('should call count for total gallery stats', async () => {
       mockPrismaService.mandate.count.mockResolvedValue(0);
       mockPrismaService.booking.count.mockResolvedValue(0);
       mockPrismaService.request.count.mockResolvedValue(0);
@@ -140,18 +133,7 @@ describe('AnalyticsService', () => {
 
       await service.getDashboardStats();
 
-      expect(mockPrismaService.gallery.count).toHaveBeenCalledWith({
-        where: { productType: ProductType.MODOOLA },
-      });
-      expect(mockPrismaService.gallery.count).toHaveBeenCalledWith({
-        where: { productType: ProductType.MACHINE_EXCHANGE },
-      });
-      expect(mockPrismaService.gallery.count).toHaveBeenCalledWith({
-        where: { productType: ProductType.TITANIUM_LASER },
-      });
-      expect(mockPrismaService.gallery.count).toHaveBeenCalledWith({
-        where: { productType: ProductType.PROJECTS },
-      });
+      expect(mockPrismaService.gallery.count).toHaveBeenCalledWith();
     });
   });
 });

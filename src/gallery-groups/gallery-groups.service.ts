@@ -12,9 +12,9 @@ export class GalleryGroupsService {
     });
   }
 
-  async findAll(productId?: string): Promise<GalleryGroup[]> {
+  async findAll(): Promise<GalleryGroup[]> {
     return await this.prisma.galleryGroup.findMany({
-      where: productId ? { productId, isActive: true } : { isActive: true },
+      where: { isActive: true },
       orderBy: { order: 'asc' },
       include: {
         images: {

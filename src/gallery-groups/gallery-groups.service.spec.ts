@@ -9,7 +9,6 @@ describe('GalleryGroupsService', () => {
 
   const mockGalleryGroup: GalleryGroup = {
     id: '1',
-    productId: 'product-1',
     title: 'Test Group',
     description: 'Test Description',
     order: 1,
@@ -97,7 +96,7 @@ describe('GalleryGroupsService', () => {
   });
 
   describe('findAll', () => {
-    it('should find all active groups without productId filter', async () => {
+    it('should find all active groups', async () => {
       const groups = [mockGalleryGroup];
       mockPrismaService.galleryGroup.findMany.mockResolvedValue(groups);
 
@@ -114,24 +113,6 @@ describe('GalleryGroupsService', () => {
         },
       });
       expect(result).toEqual(groups);
-    });
-
-    it('should filter groups by productId when provided', async () => {
-      const groups = [mockGalleryGroup];
-      mockPrismaService.galleryGroup.findMany.mockResolvedValue(groups);
-
-      await service.findAll('product-123');
-
-      expect(mockPrismaService.galleryGroup.findMany).toHaveBeenCalledWith({
-        where: { productId: 'product-123', isActive: true },
-        orderBy: { order: 'asc' },
-        include: {
-          images: {
-            where: { isActive: true },
-            orderBy: { order: 'asc' },
-          },
-        },
-      });
     });
   });
 

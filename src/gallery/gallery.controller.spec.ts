@@ -7,7 +7,6 @@ describe('GalleryController', () => {
 
   const mockGallery = {
     id: '1',
-    productId: 'product-1',
     imageUrl: 'https://example.com/image.jpg',
     caption: 'Test Image',
     description: null,
@@ -68,16 +67,13 @@ describe('GalleryController', () => {
   });
 
   describe('getAdminGallery', () => {
-    it('should return admin gallery for a productId', async () => {
+    it('should return admin gallery filtered by groupId', async () => {
       const galleries = [mockGallery];
       mockGalleryService.findAllAdmin.mockResolvedValue(galleries);
 
-      const result = await controller.getAdminGallery('product-123');
+      const result = await controller.getAdminGallery('group1');
 
-      expect(mockGalleryService.findAllAdmin).toHaveBeenCalledWith(
-        'product-123',
-        undefined,
-      );
+      expect(mockGalleryService.findAllAdmin).toHaveBeenCalledWith('group1');
       expect(result).toEqual(galleries);
     });
   });
@@ -95,7 +91,7 @@ describe('GalleryController', () => {
         ...createData,
       });
 
-      const result = await controller.create('product-456', createData);
+      const result = await controller.create(createData);
 
       expect(mockGalleryService.create).toHaveBeenCalled();
       expect(result.imageUrl).toBe(createData.imageUrl);
@@ -111,11 +107,10 @@ describe('GalleryController', () => {
 
       mockGalleryService.create.mockResolvedValue(mockGallery);
 
-      await controller.create('product-789', createData);
+      await controller.create(createData);
 
       expect(mockGalleryService.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          product: { connect: { id: 'product-789' } },
           group: { connect: { id: 'group123' } },
         }),
       );

@@ -23,13 +23,8 @@ export class GalleryService {
     });
   }
 
-  async findAllAdmin(
-    productId: string,
-    groupId?: string | null,
-  ): Promise<Gallery[]> {
-    const where: Prisma.GalleryWhereInput = {
-      productId,
-    };
+  async findAllAdmin(groupId?: string | null): Promise<Gallery[]> {
+    const where: Prisma.GalleryWhereInput = {};
 
     if (groupId) {
       where.groupId = groupId;

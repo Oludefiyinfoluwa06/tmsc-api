@@ -8,7 +8,6 @@ describe('GalleryGroupsController', () => {
 
   const mockGalleryGroup = {
     id: '1',
-    productId: 'product-1',
     title: 'Test Group',
     description: 'Test Description',
     order: 1,
@@ -66,18 +65,8 @@ describe('GalleryGroupsController', () => {
 
       const result = await controller.findAll();
 
-      expect(mockGalleryGroupsService.findAll).toHaveBeenCalledWith(undefined);
+      expect(mockGalleryGroupsService.findAll).toHaveBeenCalledWith();
       expect(result).toEqual(groups);
-    });
-
-    it('should filter by productId when provided', async () => {
-      mockGalleryGroupsService.findAll.mockResolvedValue([mockGalleryGroup]);
-
-      await controller.findAll('product-123');
-
-      expect(mockGalleryGroupsService.findAll).toHaveBeenCalledWith(
-        'product-123',
-      );
     });
   });
 
