@@ -17,6 +17,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DatabaseModule } from './database/database.module';
 import { ProductsModule } from './products/products.module';
+import { ModularCentersModule } from './modular-centers/modular-centers.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ProductsModule } from './products/products.module';
     GalleryGroupsModule,
     NotificationsModule,
     ProductsModule,
+    ModularCentersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
