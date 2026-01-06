@@ -8,7 +8,15 @@ import {
   Delete,
   Patch,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { UploadService, UploadFolder } from '../upload/upload.service';
 import { ModularCentersService } from './modular-centers.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -24,7 +32,10 @@ import {
 
 @Controller()
 export class ModularCentersController {
-  constructor(private readonly service: ModularCentersService) {}
+  constructor(
+    private readonly service: ModularCentersService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   // Public Endpoints
   @Get('modular-centers')
@@ -84,8 +95,56 @@ export class ModularCentersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.MODULAR_CENTERS_ADMIN)
   @Post('admin/modular-centers/:id/images')
-  addImage(@Param('id') id: string, @Body() data: AddCenterImageDto) {
-    return this.service.addImage(id, data);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, UploadService.getUploadPath(UploadFolder.MODULAR_CENTERS));
+        },
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+          cb(null, true);
+        } else {
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        }
+      },
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    }),
+  )
+  addImage(
+    @Param('id') id: string,
+    @Body() data: AddCenterImageDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file && !data.imageUrl) {
+      throw new HttpException(
+        'Image file or URL is required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const imageUrl = file
+      ? UploadService.getUploadUrl(UploadFolder.MODULAR_CENTERS, file.filename)
+      : data.imageUrl;
+
+    return this.service.addImage(id, {
+      ...data,
+      imageUrl,
+    });
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

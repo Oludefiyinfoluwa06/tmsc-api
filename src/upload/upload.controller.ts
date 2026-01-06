@@ -12,7 +12,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UploadService } from './upload.service';
+import { UploadService, UploadFolder } from './upload.service';
 
 @Controller('upload')
 export class UploadController {
@@ -22,9 +22,9 @@ export class UploadController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: process.env.VERCEL
-          ? '/tmp/uploads/briefs'
-          : './uploads/briefs',
+        destination: (req, file, cb) => {
+          cb(null, UploadService.getUploadPath(UploadFolder.BRIEFS));
+        },
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
@@ -55,7 +55,7 @@ export class UploadController {
   )
   uploadBrief(@UploadedFile() file: Express.Multer.File) {
     return {
-      url: `/uploads/briefs/${file.filename}`,
+      url: this.uploadService.getUploadUrl(UploadFolder.BRIEFS, file.filename),
       filename: file.filename,
     };
   }
@@ -65,9 +65,9 @@ export class UploadController {
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: diskStorage({
-        destination: process.env.VERCEL
-          ? '/tmp/uploads/gallery'
-          : './uploads/gallery',
+        destination: (req, file, cb) => {
+          cb(null, UploadService.getUploadPath(UploadFolder.GALLERY));
+        },
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
@@ -94,7 +94,7 @@ export class UploadController {
   )
   uploadGallery(@UploadedFiles() files: Array<Express.Multer.File>) {
     return files.map((file) => ({
-      url: `/uploads/gallery/${file.filename}`,
+      url: this.uploadService.getUploadUrl(UploadFolder.GALLERY, file.filename),
       filename: file.filename,
     }));
   }

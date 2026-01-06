@@ -83,9 +83,16 @@ export class ModularCentersService {
   async addImage(centerId: string, data: AddCenterImageDto) {
     // Ensure center exists
     await this.findOne(centerId);
+
+    const { imageUrl, ...rest } = data;
+    if (!imageUrl) {
+      throw new Error('imageUrl is required to add center image');
+    }
+
     return this.prisma.centerImage.create({
       data: {
-        ...data,
+        ...rest,
+        imageUrl,
         centerId,
       },
     });

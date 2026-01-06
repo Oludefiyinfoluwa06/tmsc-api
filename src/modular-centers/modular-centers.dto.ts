@@ -59,8 +59,8 @@ export class UpdateModularCenterDto {
 
 export class AddCenterImageDto {
   @IsUrl()
-  @IsNotEmpty()
-  imageUrl: string;
+  @IsOptional()
+  imageUrl?: string;
 
   @IsString()
   @IsOptional()
