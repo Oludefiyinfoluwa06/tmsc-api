@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsUrl,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export enum CenterImageType {
   MACHINE = 'MACHINE',
@@ -26,10 +27,22 @@ export class CreateModularCenterDto {
   @IsOptional()
   description?: string;
 
+  @Transform(({ value }): number | undefined =>
+    value !== undefined && value !== null
+      ? parseInt(String(value), 10)
+      : undefined,
+  )
   @IsInt()
   @IsOptional()
   order?: number;
 
+  @Transform(({ value }): boolean | undefined =>
+    value === 'true' || value === true
+      ? true
+      : value === 'false' || value === false
+        ? false
+        : undefined,
+  )
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
@@ -48,10 +61,22 @@ export class UpdateModularCenterDto {
   @IsOptional()
   description?: string;
 
+  @Transform(({ value }): number | undefined =>
+    value !== undefined && value !== null
+      ? parseInt(String(value), 10)
+      : undefined,
+  )
   @IsInt()
   @IsOptional()
   order?: number;
 
+  @Transform(({ value }): boolean | undefined =>
+    value === 'true' || value === true
+      ? true
+      : value === 'false' || value === false
+        ? false
+        : undefined,
+  )
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
@@ -70,10 +95,22 @@ export class AddCenterImageDto {
   @IsOptional()
   type?: CenterImageType;
 
+  @Transform(({ value }): number | undefined =>
+    value !== undefined && value !== null
+      ? parseInt(String(value), 10)
+      : undefined,
+  )
   @IsInt()
   @IsOptional()
   order?: number;
 
+  @Transform(({ value }): boolean | undefined =>
+    value === 'true' || value === true
+      ? true
+      : value === 'false' || value === false
+        ? false
+        : undefined,
+  )
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
@@ -88,10 +125,22 @@ export class UpdateCenterImageDto {
   @IsOptional()
   type?: CenterImageType;
 
+  @Transform(({ value }): number | undefined =>
+    value !== undefined && value !== null
+      ? parseInt(String(value), 10)
+      : undefined,
+  )
   @IsInt()
   @IsOptional()
   order?: number;
 
+  @Transform(({ value }): boolean | undefined =>
+    value === 'true' || value === true
+      ? true
+      : value === 'false' || value === false
+        ? false
+        : undefined,
+  )
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

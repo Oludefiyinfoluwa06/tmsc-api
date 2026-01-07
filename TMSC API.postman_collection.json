@@ -273,7 +273,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Product Title\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"title\": \"Updated Product Title\",\n    \"order\": 1,\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1865,7 +1865,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Center Title\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"title\": \"Updated Center Title\",\n    \"order\": 1,\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2055,7 +2055,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"caption\": \"Updated Machine Caption\",\n    \"type\": \"TRAINING\"\n}",
+							"raw": "{\n    \"caption\": \"Updated Machine Caption\",\n    \"type\": \"TRAINING\",\n    \"order\": 2,\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
