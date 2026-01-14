@@ -1,6 +1,10 @@
 deployment:
   tasks:
-    - export PATH=$HOME/.nvm/versions/node/24.6.0/bin:$PATH
+    - echo "Setting PATH for Node"
+    - export PATH=$HOME/.nvm/versions/node/v24.6.0/bin:$PATH
+    - echo "Installing dependencies"
     - npm install
+    - echo "Generating Prisma client"
     - npx prisma generate
+    - echo "Building NestJS app"
     - npm run build
