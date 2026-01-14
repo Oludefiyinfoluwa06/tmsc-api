@@ -1,0 +1,6 @@
+deployment:
+  tasks:
+    - export PATH=$HOME/.nvm/versions/node/24.6.0/bin:$PATH
+    - npm install
+    - npx prisma generate
+    - npm run build
